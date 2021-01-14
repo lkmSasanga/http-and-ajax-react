@@ -1,12 +1,25 @@
 import React, { Component } from 'react';
 // import axios from "axios";
-import {Route, NavLink} from 'react-router-dom';
+import {Route, NavLink, Switch, Redirect} from 'react-router-dom';
 
 import './Blog.css';
 import Posts from './Posts/Posts';
-import NewPost from "./NewPost/NewPost";
+import asyncComponent from "../../hoc/asyncComponent";
+// import NewPost from "./NewPost/NewPost";
+// import FullPost from './FullPost/FullPost';
+
+
+// Dynamic import
+const AsyncNewPost = asyncComponent(() => {
+    return import('./NewPost/NewPost');
+});
 
 class Blog extends Component {
+    state = {
+        auth: true
+    }
+
+
 
     render () {
         return (
@@ -15,13 +28,13 @@ class Blog extends Component {
                     <nav>
                         <ul>
                             <li><NavLink
-                                to="/"
+                                to="/posts/"
                                 exact
                                 activeClassName="my-active"
                                 activeStyle={{
                                     color: '#fa923f',
                                     textDecoration: 'underline'
-                                }}>Home</NavLink></li>
+                                }}>Posts</NavLink></li>
                             <li><NavLink to={{
                                 pathname:  '/new-post',
                                 hash: '#submit',
@@ -31,8 +44,15 @@ class Blog extends Component {
                     </nav>
                 </header>
                 {/*<Route path="/" exact render={() => <h1>Home</h1>}/>*/}
-                <Route path="/" exact component={Posts}/>
-                <Route path="/new-post" component={NewPost}/>
+
+                <Switch>
+                    {this.state.auth ? <Route path="/new-post" component={AsyncNewPost}/> : null}
+                    <Route path="/posts" component={Posts}/>
+                    <Route render={() => <h1>Not found</h1>}/>
+                    {/*<Redirect from="/" to="/posts"/>*/}
+                    {/*<Route path="/" component={Posts}/>*/}
+                </Switch>
+
 
             </div>
         );
